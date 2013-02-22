@@ -22,9 +22,9 @@ namespace BibbleGame
         float mMaxSpeed = 10;
         float mMinSpeed = -2;
         float mAccVal = 15;
-        float mBreakVal = 35;
         float mMaxTurnAngle = 10f;
         float mTurnAccVal = 30f;
+        float mMovementDirection = 0f;
 
         #region Properties 
         public virtual float Speed
@@ -52,11 +52,6 @@ namespace BibbleGame
             get { return mAccVal; }
             set { mAccVal = value; }
         }
-        public virtual float MaxNegAcceleration
-        {
-            get { return mBreakVal; }
-            set { mBreakVal = value; }
-        }
         public virtual float MaxTurnAngle
         {
             get { return mMaxTurnAngle; }
@@ -69,6 +64,15 @@ namespace BibbleGame
         public virtual float TurnVelocityLoss
         {
             get { return TURN_VEL_LOSS; }
+        }
+        public virtual float MovementDirection
+        {
+            get { return mMovementDirection - (float)Math.PI / 2.0f; }
+            set
+            {
+                mMovementDirection = value + (float)Math.PI / 2.0f;
+                //RecalculatePaintCornerOffset();
+            } // copypaste from DrawableObject.Orientation
         }
 
         #endregion
@@ -107,15 +111,15 @@ namespace BibbleGame
         public override void Update(GameTime gt)
         {
             float factor = gt.ElapsedGameTime.Milliseconds / 1000.0f;
+            float newMovementSpeed = 0;
             if (mAcc && !mBreak)
-                this.Speed += mAccVal * factor;
+                newMovementSpeed = mAccVal * factor;
             else if (mBreak && !mAcc)
-                this.Speed -= mBreakVal * factor;
-            else if (!mBreak && !mBreak)
-            {
-                float a = Math.Abs(Speed) < VelocityLoss ? Math.Abs(Speed) : VelocityLoss;
-                this.Speed -= a * Math.Sign(this.Speed) * factor;
-            }
+                newMovementSpeed = - mAccVal * factor;
+           //resistance
+            float a = Math.Abs(Speed) < VelocityLoss ? Math.Abs(Speed) : VelocityLoss;
+            this.Speed -= a * Math.Sign(this.Speed) * factor;
+            
 
             if (mTurnLeft && !mTurnRight)
                 this.TurnSpeed -= mTurnAccVal * factor;
@@ -127,8 +131,15 @@ namespace BibbleGame
 
             mAcc = mBreak = mTurnLeft = mTurnRight = false;
 
-            Position = new Vector2(Position.X + Speed * (float)Math.Cos(Orientation),
-            Position.Y + Speed * (float)Math.Sin(Orientation));
+            Vector2 oldMvmt = new Vector2(Speed * (float)Math.Cos(MovementDirection), 
+                Speed * (float)Math.Sin(MovementDirection));
+            Vector2 newMvmt = new Vector2(newMovementSpeed * (float)Math.Cos(Orientation),
+            newMovementSpeed * (float)Math.Sin(Orientation));
+
+            Vector2 resulting = oldMvmt + newMvmt;
+            this.Speed = resulting.Length();
+            this.MovementDirection = (float)Math.Atan2(resulting.Y, resulting.X);
+            Position += oldMvmt + newMvmt;
 
         }
     }
