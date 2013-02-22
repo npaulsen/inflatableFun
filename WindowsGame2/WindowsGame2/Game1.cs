@@ -131,7 +131,7 @@ namespace BibbleGame
             Statics.Circle50 = CreateCircle(50);
             Statics.Circle100 = CreateCircle(100);
             Statics.Circle150 = CreateCircle(150);
-            Statics.BackgroundTex = this.Content.Load<Texture2D>("planet");
+            Statics.BackgroundTex = this.Content.Load<Texture2D>("water");
             Statics.BoxTex = this.Content.Load<Texture2D>("health");
 
             Statics.laser = this.Content.Load<SoundEffect>("laser1");
@@ -283,7 +283,7 @@ namespace BibbleGame
            // int screenWidth = Window.ClientBounds.Width, screenHeight = Window.ClientBounds.Height;
             SpriteBatch sbg = new Microsoft.Xna.Framework.Graphics.SpriteBatch(this.GraphicsDevice);
             sbg.Begin();
-            //sbg.Draw(Statics.BackgroundTex, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, .9f);
+            sbg.Draw(Statics.BackgroundTex, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, .9f);
             sbg.End();
             spriteBatch.Begin();
             
