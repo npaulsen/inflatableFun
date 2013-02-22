@@ -333,8 +333,8 @@ namespace BibbleGame
                 if (position.X > screenWidth) position.X = screenWidth - 15;
                 if (position.Y < 0) position.Y = 15;
                 if (position.Y > screenHeight) position.Y = screenHeight - 15;
-                position = PaintCorner((int)(bib.Width * 0.2f), (int)(bib.Height * 0.2f), bib.Orientation + (float)Math.PI/2f, position);
-                spriteBatch.Draw(Statics.BibbleTex, position, Statics.BibbleTex.Bounds, bib.Color, bib.Orientation + (float)Math.PI / 2f, new Vector2(0, 0), .2f, SpriteEffects.None, 0);
+                position = PaintCorner((int)(bib.Width * 0.2f), (int)(bib.Height * 0.2f), bib.Orientation, position);
+                spriteBatch.Draw(Statics.BibbleTex, position, Statics.BibbleTex.Bounds, bib.Color, bib.Orientation, new Vector2(0, 0), .2f, SpriteEffects.None, 0);
             }
 
 
