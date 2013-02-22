@@ -128,7 +128,7 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WindowsGame2Content\WindowsGame2Content.contentproj">
+    <ProjectReference Include="..\WindowsGame2Content\InflatableContent.contentproj">
       <Name>WindowsGame2Content %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
       <Project>{2D1CC87F-C9AD-4E2B-9063-F640741048FA}</Project>

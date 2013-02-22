@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inflatable", "WindowsGame2\WindowsGame2\Inflatable.csproj", "{4CCD716E-AB86-407A-B0E2-12A66F8412D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InflatableContent", "WindowsGame2\WindowsGame2Content\InflatableContent.contentproj", "{2D1CC87F-C9AD-4E2B-9063-F640741048FA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0375424A-555F-4ECC-8A2C-C112D076C8CD}"
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = WindowsGame2.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Debug|x86.ActiveCfg = Debug|x86
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Debug|x86.Build.0 = Debug|x86
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Release|Any CPU.ActiveCfg = Release|x86
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Release|Mixed Platforms.Build.0 = Release|x86
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Release|x86.ActiveCfg = Release|x86
+		{4CCD716E-AB86-407A-B0E2-12A66F8412D8}.Release|x86.Build.0 = Release|x86
+		{2D1CC87F-C9AD-4E2B-9063-F640741048FA}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{2D1CC87F-C9AD-4E2B-9063-F640741048FA}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{2D1CC87F-C9AD-4E2B-9063-F640741048FA}.Debug|x86.ActiveCfg = Debug|x86
+		{2D1CC87F-C9AD-4E2B-9063-F640741048FA}.Release|Any CPU.ActiveCfg = Release|x86
+		{2D1CC87F-C9AD-4E2B-9063-F640741048FA}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{2D1CC87F-C9AD-4E2B-9063-F640741048FA}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
