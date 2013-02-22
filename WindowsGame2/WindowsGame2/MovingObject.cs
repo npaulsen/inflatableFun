@@ -10,8 +10,10 @@ namespace BibbleGame
     public class MovingObject : DrawableObject
     {
         private const float VEL_LOSS = 15f;
+        private const float TURN_VEL_LOSS = 15f;
 
         float mSpeed = 0f;
+        float mTurnSpeed = 0f;
         bool mAcc;
         bool mBreak;
         bool mTurnLeft;
@@ -21,14 +23,19 @@ namespace BibbleGame
         float mMinSpeed = -2;
         float mAccVal = 15;
         float mBreakVal = 35;
-        float mTurnAngle = 10;
+        float mMaxTurnAngle = 10f;
+        float mTurnAccVal = 30f;
 
         #region Properties 
-        // TODO: only getter?
         public virtual float Speed
         {
             get { return mSpeed; }
             set { mSpeed = (value > MaxSpeed) ? MaxSpeed : (value < -2) ? -2 : value; }
+        }
+        public virtual float TurnSpeed
+        {
+            get { return mTurnSpeed; }
+            set { mTurnSpeed = (value > MaxTurnAngle) ? MaxTurnAngle : (value < -MaxTurnAngle) ? -MaxTurnAngle : value; }
         }
         public virtual float MinSpeed
         {
@@ -50,14 +57,18 @@ namespace BibbleGame
             get { return mBreakVal; }
             set { mBreakVal = value; }
         }
-        public virtual float TurnAngle
+        public virtual float MaxTurnAngle
         {
-            get { return mTurnAngle; }
-            set { mTurnAngle = value; }
+            get { return mMaxTurnAngle; }
+            set { mMaxTurnAngle = value; }
         }
         public virtual float VelocityLoss
         {
             get { return VEL_LOSS; }
+        }
+        public virtual float TurnVelocityLoss
+        {
+            get { return TURN_VEL_LOSS; }
         }
 
         #endregion
@@ -105,10 +116,14 @@ namespace BibbleGame
                 float a = Math.Abs(Speed) < VelocityLoss ? Math.Abs(Speed) : VelocityLoss;
                 this.Speed -= a * Math.Sign(this.Speed) * factor;
             }
-                            
 
-            if (mTurnLeft != mTurnRight)
-                this.Orientation += (mTurnLeft) ? -mTurnAngle * factor : mTurnAngle * factor;
+            if (mTurnLeft && !mTurnRight)
+                this.TurnSpeed -= mTurnAccVal * factor;
+            else if (!mTurnLeft && mTurnRight)
+                this.TurnSpeed += mTurnAccVal * factor;
+            else
+                this.TurnSpeed = 0;
+            this.Orientation += TurnSpeed * factor;
 
             mAcc = mBreak = mTurnLeft = mTurnRight = false;
 
@@ -116,6 +131,5 @@ namespace BibbleGame
             Position.Y + Speed * (float)Math.Sin(Orientation));
 
         }
-
     }
 }
