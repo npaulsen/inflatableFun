@@ -84,6 +84,7 @@ namespace BibbleGame
             : base(tex, pos, g, scale)
         {
             this.Orientation = orient;
+            this.MovementDirection = orient;
             this.Speed = speed;
         }
 
