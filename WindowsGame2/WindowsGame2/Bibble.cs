@@ -29,7 +29,7 @@ namespace BibbleGame
 
         public int SpawnMS = 0;
 
-        public Bibble(BibbleGame game, Texture2D tex) : this(game, tex, Color.Blue) { }
+        public Bibble(BibbleGame game, Texture2D tex) : this(game, tex, Color.White) { }
 
         public Bibble(BibbleGame game, Texture2D tex, Color color)
             : base(game, tex, new Vector2(111,111))
