@@ -125,7 +125,7 @@ namespace BibbleGame
             // SpriteBatch for Explosions, Smoke etc
             spriteBatchEffects = new SpriteBatch(GraphicsDevice);
 
-            Statics.BibbleTex = this.Content.Load<Texture2D>("SquareGuy");
+            Statics.BibbleTex = this.Content.Load<Texture2D>("chick");
             Statics.BulletTex = this.Content.Load<Texture2D>("bullet");
             Statics.MineTex = this.Content.Load<Texture2D>("mine");
             Statics.Circle50 = CreateCircle(50);
@@ -283,7 +283,7 @@ namespace BibbleGame
            // int screenWidth = Window.ClientBounds.Width, screenHeight = Window.ClientBounds.Height;
             SpriteBatch sbg = new Microsoft.Xna.Framework.Graphics.SpriteBatch(this.GraphicsDevice);
             sbg.Begin();
-            sbg.Draw(Statics.BackgroundTex, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, .9f);
+            //sbg.Draw(Statics.BackgroundTex, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, .9f);
             sbg.End();
             spriteBatch.Begin();
             
