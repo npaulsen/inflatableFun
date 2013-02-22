@@ -132,7 +132,7 @@ namespace BibbleGame
             Statics.Circle100 = CreateCircle(100);
             Statics.Circle150 = CreateCircle(150);
             Statics.BackgroundTex = this.Content.Load<Texture2D>("planet");
-            Statics.BoxTex = this.Content.Load<Texture2D>("box");
+            Statics.BoxTex = this.Content.Load<Texture2D>("health");
 
             Statics.laser = this.Content.Load<SoundEffect>("laser1");
             Statics.laugh = this.Content.Load<SoundEffect>("laugh1");
