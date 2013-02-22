@@ -104,9 +104,11 @@ namespace BibbleGame
         {
             base.Initialize();
             bib1 = new Bibble(this, Statics.BibbleTex);
+            bib1.Zoom = 100f / Statics.BibbleTex.Width;
             Color c = Color.Purple;
             c.A = 0x8F;
             bib2 = new Bibble(this, Statics.BibbleTex, Color.Purple);
+            bib2.Zoom = 100f / Statics.BibbleTex.Width;
             //TODO: list of all damageable objects
             bibbles = new List<Bibble>();
             bibbles.Add(bib1);
@@ -328,13 +330,14 @@ namespace BibbleGame
             }
             else
             {
+                float thumbFactor = 0.3f;
                 Vector2 position = bib.Position;
-                if (position.X < 0) position.X = 15;
-                if (position.X > screenWidth) position.X = screenWidth - 15;
-                if (position.Y < 0) position.Y = 15;
-                if (position.Y > screenHeight) position.Y = screenHeight - 15;
-                position = PaintCorner((int)(bib.Width * 0.2f), (int)(bib.Height * 0.2f), bib.Orientation + (float)Math.PI/2f, position);
-                spriteBatch.Draw(Statics.BibbleTex, position, Statics.BibbleTex.Bounds, bib.Color, bib.Orientation + (float)Math.PI / 2f, new Vector2(0, 0), .2f, SpriteEffects.None, 0);
+                if (position.X < 0) position.X = 25;
+                if (position.X > screenWidth) position.X = screenWidth - 25;
+                if (position.Y < 0) position.Y = 25;
+                if (position.Y > screenHeight) position.Y = screenHeight - 25;
+                position = PaintCorner((int)(bib.Width * thumbFactor), (int)(bib.Height * thumbFactor), bib.Orientation + (float)Math.PI/2f, position);
+                spriteBatch.Draw(Statics.BibbleTex, position, Statics.BibbleTex.Bounds, bib.Color, bib.Orientation + (float)Math.PI / 2f, new Vector2(0, 0), bib.Zoom * thumbFactor, SpriteEffects.None, 0);
             }
 
 

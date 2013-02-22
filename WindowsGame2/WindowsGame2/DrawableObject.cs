@@ -47,6 +47,16 @@ namespace BibbleGame
         public float Width { get { return mWidth; } }
         private float mHeight;
         public float Height { get { return mHeight; } }
+        public float Zoom
+        {
+            get { return mZoom; }
+            set
+            {
+                mZoom = value; // TODO range control
+                mWidth = mWidth * value;
+                mHeight = mHeight * value;
+            }
+        }
         #endregion
 
         public DrawableObject(Texture2D tex, Vector2 pos, Game g, float scale) : base(g) {
