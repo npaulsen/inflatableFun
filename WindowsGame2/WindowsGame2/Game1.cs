@@ -72,7 +72,7 @@ namespace BibbleGame
         public BibbleGame()
         {
             Window.AllowUserResizing = true;
-            IsFixedTimeStep = false;
+            IsFixedTimeStep = true;
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
