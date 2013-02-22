@@ -53,6 +53,9 @@ namespace BibbleGame
 
         KeyboardState lastKeyboard;
 
+        GamePadState lastGamePadOne;
+        GamePadState lastGamePadTwo;
+
         SpriteFont font, fontHuge;
 
         // a random number generator that the whole sample can share.
@@ -160,22 +163,22 @@ namespace BibbleGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            if (Keyboard.GetState().IsKeyDown(Keys.Right) || GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X > 0)
                 bib1.Turn(false);
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            if (Keyboard.GetState().IsKeyDown(Keys.Left) || GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X < 0)
                 bib1.Turn(true);
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            if (Keyboard.GetState().IsKeyDown(Keys.Up) || GamePad.GetState(PlayerIndex.One).Triggers.Right > 0.1)
                 bib1.Accelerate();
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            if (Keyboard.GetState().IsKeyDown(Keys.Down) || GamePad.GetState(PlayerIndex.One).Triggers.Left > 0.1)
                 bib1.Break();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.D))
+            if (Keyboard.GetState().IsKeyDown(Keys.D) || GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X > 0)
                 bib2.Turn(false);
-            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            if (Keyboard.GetState().IsKeyDown(Keys.A) || GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X < 0)
                 bib2.Turn(true);
-            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            if (Keyboard.GetState().IsKeyDown(Keys.W) || GamePad.GetState(PlayerIndex.Two).Triggers.Right > 0.1)
                 bib2.Accelerate();
-            if (Keyboard.GetState().IsKeyDown(Keys.S))
+            if (Keyboard.GetState().IsKeyDown(Keys.S) || GamePad.GetState(PlayerIndex.Two).Triggers.Left > 0.1)
                 bib2.Break();
 
             if (Keyboard.GetState().IsKeyDown(Keys.Z))
@@ -185,19 +188,19 @@ namespace BibbleGame
             bib2.Update(gameTime);
             if (lastKeyboard != null)
             {
-                if (lastKeyboard.IsKeyDown(Keys.M) && Keyboard.GetState().IsKeyUp(Keys.M))
+                if ((lastKeyboard.IsKeyDown(Keys.M) && Keyboard.GetState().IsKeyUp(Keys.M)) || (lastGamePadOne.IsButtonDown(Buttons.A) && GamePad.GetState(PlayerIndex.One).IsButtonUp(Buttons.A)))
                 {
                     bib1.MineAction();
                 }
-                if (lastKeyboard.IsKeyDown(Keys.N) && Keyboard.GetState().IsKeyUp(Keys.N))
+                if ((lastKeyboard.IsKeyDown(Keys.N) && Keyboard.GetState().IsKeyUp(Keys.N)) || (lastGamePadOne.IsButtonDown(Buttons.X) && GamePad.GetState(PlayerIndex.One).IsButtonUp(Buttons.X)))
                 {
                     bib1.ShootAction();
                 }
-                if (lastKeyboard.IsKeyDown(Keys.LeftShift) && Keyboard.GetState().IsKeyUp(Keys.LeftShift))
+                if ((lastKeyboard.IsKeyDown(Keys.LeftShift) && Keyboard.GetState().IsKeyUp(Keys.LeftShift)) || (lastGamePadTwo.IsButtonDown(Buttons.A) && GamePad.GetState(PlayerIndex.Two).IsButtonUp(Buttons.A)))
                 {
                     bib2.MineAction();
                 }
-                if (lastKeyboard.IsKeyDown(Keys.CapsLock) && Keyboard.GetState().IsKeyUp(Keys.CapsLock))
+                if ((lastKeyboard.IsKeyDown(Keys.CapsLock) && Keyboard.GetState().IsKeyUp(Keys.CapsLock)) || (lastGamePadTwo.IsButtonDown(Buttons.X) && GamePad.GetState(PlayerIndex.Two).IsButtonUp(Buttons.X)))
                 {
                     bib2.ShootAction();
                 }
@@ -206,6 +209,8 @@ namespace BibbleGame
 
             base.Update(gameTime);
             lastKeyboard = Keyboard.GetState();
+            lastGamePadOne = GamePad.GetState(PlayerIndex.One);
+            lastGamePadTwo = GamePad.GetState(PlayerIndex.Two);
             
         }
 
