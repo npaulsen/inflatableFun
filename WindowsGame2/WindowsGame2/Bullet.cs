@@ -36,7 +36,7 @@ namespace BibbleGame
             b.Damage(Damage);
             BibbleGame g = Game as BibbleGame;
             if (g != null)
-                g.Explosion(b.Position, 0.1f, false);
+                g.Explosion(Position, 0.1f, false);
             return true;
         }
     }
