@@ -112,6 +112,7 @@
     <Compile Include="Collidable.cs" />
     <Compile Include="DrawableObject.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="ItemSpawner.cs" />
     <Compile Include="MovingObject.cs" />
     <Compile Include="Mine.cs" />
     <Compile Include="Particles\ExplosionParticleSystem.cs" />

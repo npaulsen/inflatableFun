@@ -17,6 +17,11 @@ namespace BibbleGame
         public Mine(Vector2 pos, Bibble owner, Texture2D tex, Game g) : base(tex, pos, g)
         {
             this.owner = owner;
+            if (owner != null)
+            {
+                this.OuterRadius = owner.MineOuterRadius;
+                this.InnerDamage = owner.MineDamage;
+            }
         }
 
         public override void Draw(GameTime gt) {

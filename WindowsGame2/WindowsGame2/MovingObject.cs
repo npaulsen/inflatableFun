@@ -11,6 +11,8 @@ namespace BibbleGame
     {
         private const float VEL_LOSS = 15f;
         private const float TURN_VEL_LOSS = 15f;
+        const float MAX_MAX_SPEED = 20;
+        const float MAX_ACCELERATION = 30;
 
         float mSpeed = 0f;
         float mTurnSpeed = 0f;
@@ -22,7 +24,10 @@ namespace BibbleGame
         float mMaxSpeed = 10;
         float mMinSpeed = -2;
         float mAccVal = 15;
+        float mAccIntensity = 1;
+        float mBreakIntensity = 1;
         float mMaxTurnAngle = 10f;
+        float mTurnIntensity = 0;
         float mTurnAccVal = 30f;
         float mMovementDirection = 0f;
 
@@ -45,12 +50,12 @@ namespace BibbleGame
         public virtual float MaxSpeed
         {
             get { return mMaxSpeed; }
-            set { mMaxSpeed = value; }
+            set { mMaxSpeed = value > MAX_MAX_SPEED? MAX_MAX_SPEED : value; }
         }
         public virtual float MaxAcceleration
         {
             get { return mAccVal; }
-            set { mAccVal = value; }
+            set { mAccVal = value > MAX_ACCELERATION? MAX_ACCELERATION : value; }
         }
         public virtual float MaxTurnAngle
         {
@@ -94,19 +99,33 @@ namespace BibbleGame
         public void Accelerate()
         {
             mAcc = true;
+            mAccIntensity = 1;
+        }
+
+        public void Accelerate(float intensity)
+        {
+            mAcc = true;
+            mAccIntensity = intensity;
         }
 
         public void Break()
         {
             mBreak = true;
         }
-        
-        public void Turn(bool left)
+
+        public void Break(float intensity)
         {
-            if (left)
+            mBreak = true;
+            mBreakIntensity = intensity;
+        }
+        
+        public void Turn(float intensity)
+        {
+            if (intensity < 0)
                 mTurnLeft = true;
             else
                 mTurnRight = true;
+            mTurnIntensity = intensity;
         }
 
         public override void Update(GameTime gt)
@@ -114,18 +133,18 @@ namespace BibbleGame
             float factor = gt.ElapsedGameTime.Milliseconds / 1000.0f;
             float newMovementSpeed = 0;
             if (mAcc && !mBreak)
-                newMovementSpeed = mAccVal * factor;
+                newMovementSpeed = mAccIntensity * MaxAcceleration * factor;
             else if (mBreak && !mAcc)
-                newMovementSpeed = - mAccVal * factor;
+                newMovementSpeed = - mBreakIntensity * MaxAcceleration * factor;
            //resistance
             float a = Math.Abs(Speed) < VelocityLoss ? Math.Abs(Speed) : VelocityLoss;
             this.Speed -= a * Math.Sign(this.Speed) * factor;
             
 
             if (mTurnLeft && !mTurnRight)
-                this.TurnSpeed -= mTurnAccVal * factor;
+                this.TurnSpeed += mTurnIntensity * mTurnAccVal * factor;
             else if (!mTurnLeft && mTurnRight)
-                this.TurnSpeed += mTurnAccVal * factor;
+                this.TurnSpeed += mTurnIntensity * mTurnAccVal * factor;
             else
                 this.TurnSpeed = 0;
             this.Orientation += TurnSpeed * factor;

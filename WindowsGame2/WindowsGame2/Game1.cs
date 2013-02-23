@@ -41,6 +41,7 @@ namespace BibbleGame
             public SoundEffect laugh;
             public SoundEffect explosion;
             public SoundEffect comic;
+            public SoundEffect quack;
         }
         public static Defaults Statics;
 
@@ -67,6 +68,7 @@ namespace BibbleGame
 
         public SpriteBatch SpriteBatch { get { return spriteBatch; } }
         public SpriteBatch SpriteBatchEffects { get { return spriteBatchEffects; } }
+        public SpriteFont SpriteFont { get { return font; } }
         #endregion
 
         public BibbleGame()
@@ -113,6 +115,7 @@ namespace BibbleGame
             bibbles = new List<Bibble>();
             bibbles.Add(bib1);
             bibbles.Add(bib2);
+            this.Components.Add(new ItemSpawner(this, 10000));
            
         }
 
@@ -140,7 +143,7 @@ namespace BibbleGame
             Statics.laugh = this.Content.Load<SoundEffect>("laugh1");
             Statics.explosion = this.Content.Load<SoundEffect>("explosionSound");
             Statics.comic = this.Content.Load<SoundEffect>("comic");
-
+            Statics.quack = this.Content.Load<SoundEffect>("duck-quack4");
             font = Content.Load<SpriteFont>("font");
             fontHuge = Content.Load<SpriteFont>("fontHuge");
         }
@@ -161,31 +164,75 @@ namespace BibbleGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Right) || GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X > 0)
-                bib1.Turn(false);
-            if (Keyboard.GetState().IsKeyDown(Keys.Left) || GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X < 0)
-                bib1.Turn(true);
-            if (Keyboard.GetState().IsKeyDown(Keys.Up) || GamePad.GetState(PlayerIndex.One).Triggers.Right > 0.1)
+            #region controls
+
+            //Keyboard
+
+            //Player 1: Turn right
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                bib1.Turn(1.0f);
+            //Player 1: Turn left
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                bib1.Turn(-1.0f);
+            //Player 1: Accelerate
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
                 bib1.Accelerate();
-            if (Keyboard.GetState().IsKeyDown(Keys.Down) || GamePad.GetState(PlayerIndex.One).Triggers.Left > 0.1)
+            //Player 1: Break
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
                 bib1.Break();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.D) || GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X > 0)
-                bib2.Turn(false);
-            if (Keyboard.GetState().IsKeyDown(Keys.A) || GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X < 0)
-                bib2.Turn(true);
-            if (Keyboard.GetState().IsKeyDown(Keys.W) || GamePad.GetState(PlayerIndex.Two).Triggers.Right > 0.1)
+            //Player 2: Turn right
+            if (Keyboard.GetState().IsKeyDown(Keys.D))
+                bib2.Turn(-1.0f);
+            //Player 2: Turn left
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
+                bib2.Turn(1.0f);
+            //Player 2: Accelerate
+            if (Keyboard.GetState().IsKeyDown(Keys.W))
                 bib2.Accelerate();
-            if (Keyboard.GetState().IsKeyDown(Keys.S) || GamePad.GetState(PlayerIndex.Two).Triggers.Left > 0.1)
+            //Player 2: Break
+            if (Keyboard.GetState().IsKeyDown(Keys.S))
                 bib2.Break();
 
             if (Keyboard.GetState().IsKeyDown(Keys.Z))
                 LaunchItem();
             
+            //GamePad
+
+            //Exit
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                this.Exit();
+
+            //Player 1: Turn right
+            if (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X > 0)
+                bib1.Turn(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X);
+            //Player 1: Turn left
+            if (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X < 0)
+                bib1.Turn(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X);
+            //Player 1: Accelerate
+            if (GamePad.GetState(PlayerIndex.One).Triggers.Right > 0)
+                bib1.Accelerate(GamePad.GetState(PlayerIndex.One).Triggers.Right);
+            //Player 1: Break
+            if (GamePad.GetState(PlayerIndex.One).Triggers.Left > 0.1)
+                bib1.Break(GamePad.GetState(PlayerIndex.One).Triggers.Left);
+
+            //Player 2: Turn right
+            if (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X > 0)
+                bib2.Turn(GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X);
+            //Player 2: Turn left
+            if (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X < 0)
+                bib2.Turn(GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X);
+            //Player 2: Accelerate
+            if (GamePad.GetState(PlayerIndex.Two).Triggers.Right > 0.1)
+                bib2.Accelerate(GamePad.GetState(PlayerIndex.Two).Triggers.Right);
+            //Player 2: Break
+            if (GamePad.GetState(PlayerIndex.Two).Triggers.Left > 0.1)
+                bib2.Break(GamePad.GetState(PlayerIndex.Two).Triggers.Left);
+
+            #endregion
+
+
             bib1.Update(gameTime);
             bib2.Update(gameTime);
             if (lastKeyboard != null)
@@ -218,9 +265,36 @@ namespace BibbleGame
 
         private void LaunchItem()
         {
-            Item i = new Item(new Vector2(Random.Next(100,500), Random.Next(100,500)), this);
+            Item i = new Item(this, new Vector2(-1, -1));
+            AddItem(i);
+        }
+
+        public void AddItem(Item i)
+        {
+            if (i.Position == new Vector2(-1, -1))
+            { // guess random, free position
+                int tries;
+                for (tries = 25; tries > 0; tries--)
+                {
+                    i.Position = new Vector2(Random.Next(50, Window.ClientBounds.Width - 50),
+                                        Random.Next(50, Window.ClientBounds.Height - 50));
+                    bool collides = false;
+                    foreach (Bibble b in bibbles)
+                        if ((b.Position - i.Position).Length() * 2 < b.Width + i.Width + 100)
+                        {
+                            collides = true;
+                            break; // too close to a player
+                        }
+                    // TODO: other
+                    if (!collides) break; // tries >= 1
+                   
+                }
+                if (tries <= 0)
+                    return; // failed to find a valid spawn position
+            }
             Components.Add(i);
             items.Add(i);
+            
         }
 
         private void CheckCollisions()
@@ -283,12 +357,13 @@ namespace BibbleGame
         { // http://gamedev.stackexchange.com/questions/24298/performance-architectural-implications-of-calling-spritebatch-begin-end-in-many
             GraphicsDevice.Clear(Color.CornflowerBlue);
            // int screenWidth = Window.ClientBounds.Width, screenHeight = Window.ClientBounds.Height;
+
             SpriteBatch sbg = new Microsoft.Xna.Framework.Graphics.SpriteBatch(this.GraphicsDevice);
-            sbg.Begin();
+            sbg.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             sbg.Draw(Statics.BackgroundTex, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, .9f);
             sbg.End();
             spriteBatch.Begin();
-            
+
             drawBib(bib1, gameTime);
             drawBib(bib2, gameTime);
 
