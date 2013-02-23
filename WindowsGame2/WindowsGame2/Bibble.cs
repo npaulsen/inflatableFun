@@ -12,7 +12,12 @@ namespace BibbleGame
         const int SPAWN_TIME = 5000;
         const int BLINK_TIME = 250;
         static Color BLINK_COLOR = Color.Red;
-
+        const float DEFAULT_BULLET_SPEED = 20;
+        const int DEFAULT_BULLET_DAMAGE = 5;
+        const float DEFAULT_MINE_DAMAGE = 50;
+        const float MAX_MINE_DAMAGE = 80;
+        const float DEFAULT_MINE_OUTER_RADIUS = 100;
+        const float MAX_MINE_OUTER_RADIUS = 600;
 
         public Color BibbleColor;
 
@@ -20,7 +25,8 @@ namespace BibbleGame
 
         BibbleGame game;
 
-        public int Health = 100;
+        private int mHealth = 100;
+        private int mMaxHealth = 150;
         public int Deaths = 0;
 
         public bool IsDead;
@@ -28,6 +34,55 @@ namespace BibbleGame
         public int mLastHitMS = 0;
 
         public int SpawnMS = 0;
+
+        private float mBulletSpeed = DEFAULT_BULLET_SPEED;
+        private int mBulletDamage = DEFAULT_BULLET_DAMAGE;
+        private int mSplitBulletMode = 1;
+        private float mSplitBulletAngle = .25f;
+        private float mMineDamage = DEFAULT_MINE_DAMAGE;
+        private float mMineOuterRadius = DEFAULT_MINE_OUTER_RADIUS;
+        public int Health
+        {
+            get { return mHealth; }
+            set { mHealth =  value > MaxHealth? MaxHealth: value < 0? 0 : value; }
+        }
+        public int MaxHealth
+        {
+            get { return mMaxHealth; }
+            set { mMaxHealth = value; }
+        }
+        public float MineOuterRadius
+        {
+            get { return mMineOuterRadius; }
+            set { mMineOuterRadius = value > MAX_MINE_OUTER_RADIUS? MAX_MINE_OUTER_RADIUS : value; }
+        }
+        public float MineDamage
+        {
+            get { return mMineDamage; }
+            set { mMineDamage = value > MAX_MINE_DAMAGE? MAX_MINE_DAMAGE : value; }
+        }
+        public float SplitBulletAngle
+        {
+            get { return mSplitBulletAngle; }
+            set { mSplitBulletAngle = value; }
+        }
+
+        public int SplitBulletMode
+        {
+            get { return mSplitBulletMode; }
+            set { mSplitBulletMode = value; }
+        }
+        public int BulletDamage
+        {
+            get { return mBulletDamage; }
+            set { mBulletDamage = value; }
+        }
+        public float BulletSpeed
+        {
+            get { return mBulletSpeed; }
+            set { mBulletSpeed = value; }
+        }
+       
 
         public Bibble(BibbleGame game, Texture2D tex) : this(game, tex, Color.White) { }
 
@@ -108,8 +163,16 @@ namespace BibbleGame
         internal void ShootAction()
         {
             if (IsDead) return;
-            Bullet b = new Bullet(game, this, this.Position, this.Orientation, this.Speed + 10);
-            game.addBullet(b);
+            float bSpeed = BulletSpeed <= Speed + 1 ? Speed + 1 : BulletSpeed; // Bullets always faster than actual speed
+            game.addBullet(new Bullet(game, this, this.Position, this.Orientation, bSpeed));
+            for (int i = 1; i <= SplitBulletMode; i++)
+            {
+                game.addBullet(new Bullet(game, this, this.Position,
+                    this.Orientation + i * SplitBulletAngle, bSpeed));
+                game.addBullet(new Bullet(game, this, this.Position,
+                    this.Orientation - i * SplitBulletAngle, bSpeed));
+            }
+            
             BibbleGame.Statics.laser.Play(.2f, 0, 1);
         }
 

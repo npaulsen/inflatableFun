@@ -10,7 +10,7 @@ namespace BibbleGame
     {
         private float mDamage = 5;
         public Bibble Owner;
-
+        
         public float Damage { get { return mDamage; } }
         public override float MaxSpeed
         {
@@ -28,6 +28,7 @@ namespace BibbleGame
             : base(g, BibbleGame.Statics.BulletTex, pos, orient, speed, 3/40.0f)
         {
             this.Owner = owner;
+            this.mDamage = owner.BulletDamage;
         }
 
         public bool Collide(Bibble b)

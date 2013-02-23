@@ -11,6 +11,8 @@ namespace BibbleGame
     {
         private const float VEL_LOSS = 15f;
         private const float TURN_VEL_LOSS = 15f;
+        const float MAX_MAX_SPEED = 20;
+        const float MAX_ACCELERATION = 30;
 
         float mSpeed = 0f;
         float mTurnSpeed = 0f;
@@ -48,12 +50,12 @@ namespace BibbleGame
         public virtual float MaxSpeed
         {
             get { return mMaxSpeed; }
-            set { mMaxSpeed = value; }
+            set { mMaxSpeed = value > MAX_MAX_SPEED? MAX_MAX_SPEED : value; }
         }
         public virtual float MaxAcceleration
         {
             get { return mAccVal; }
-            set { mAccVal = value; }
+            set { mAccVal = value > MAX_ACCELERATION? MAX_ACCELERATION : value; }
         }
         public virtual float MaxTurnAngle
         {
@@ -131,9 +133,9 @@ namespace BibbleGame
             float factor = gt.ElapsedGameTime.Milliseconds / 1000.0f;
             float newMovementSpeed = 0;
             if (mAcc && !mBreak)
-                newMovementSpeed = mAccIntensity * mAccVal * factor;
+                newMovementSpeed = mAccIntensity * MaxAcceleration * factor;
             else if (mBreak && !mAcc)
-                newMovementSpeed = - mBreakIntensity * mAccVal * factor;
+                newMovementSpeed = - mBreakIntensity * MaxAcceleration * factor;
            //resistance
             float a = Math.Abs(Speed) < VelocityLoss ? Math.Abs(Speed) : VelocityLoss;
             this.Speed -= a * Math.Sign(this.Speed) * factor;

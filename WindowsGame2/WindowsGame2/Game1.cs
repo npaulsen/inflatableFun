@@ -68,6 +68,7 @@ namespace BibbleGame
 
         public SpriteBatch SpriteBatch { get { return spriteBatch; } }
         public SpriteBatch SpriteBatchEffects { get { return spriteBatchEffects; } }
+        public SpriteFont SpriteFont { get { return font; } }
         #endregion
 
         public BibbleGame()
@@ -264,7 +265,7 @@ namespace BibbleGame
 
         private void LaunchItem()
         {
-            Item i = new HealthItem(new Vector2(-1, -1), this);
+            Item i = new Item(this, new Vector2(-1, -1));
             AddItem(i);
         }
 
