@@ -113,6 +113,7 @@ namespace BibbleGame
             bibbles = new List<Bibble>();
             bibbles.Add(bib1);
             bibbles.Add(bib2);
+            this.Components.Add(new ItemSpawner(this, 10000));
            
         }
 
@@ -218,9 +219,36 @@ namespace BibbleGame
 
         private void LaunchItem()
         {
-            Item i = new Item(new Vector2(Random.Next(100,500), Random.Next(100,500)), this);
+            Item i = new Item(new Vector2(-1, -1), this);
+            AddItem(i);
+        }
+
+        public void AddItem(Item i)
+        {
+            if (i.Position == new Vector2(-1, -1))
+            { // guess random, free position
+                int tries;
+                for (tries = 25; tries > 0; tries--)
+                {
+                    i.Position = new Vector2(Random.Next(50, Window.ClientBounds.Width - 50),
+                                        Random.Next(50, Window.ClientBounds.Height - 50));
+                    bool collides = false;
+                    foreach (Bibble b in bibbles)
+                        if ((b.Position - i.Position).Length() * 2 < b.Width + i.Width + 100)
+                        {
+                            collides = true;
+                            break; // too close to a player
+                        }
+                    // TODO: other
+                    if (!collides) break; // tries >= 1
+                   
+                }
+                if (tries <= 0)
+                    return; // failed to find a valid spawn position
+            }
             Components.Add(i);
             items.Add(i);
+            
         }
 
         private void CheckCollisions()
@@ -283,12 +311,13 @@ namespace BibbleGame
         { // http://gamedev.stackexchange.com/questions/24298/performance-architectural-implications-of-calling-spritebatch-begin-end-in-many
             GraphicsDevice.Clear(Color.CornflowerBlue);
            // int screenWidth = Window.ClientBounds.Width, screenHeight = Window.ClientBounds.Height;
+
             SpriteBatch sbg = new Microsoft.Xna.Framework.Graphics.SpriteBatch(this.GraphicsDevice);
-            sbg.Begin();
+            sbg.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             sbg.Draw(Statics.BackgroundTex, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, .9f);
             sbg.End();
             spriteBatch.Begin();
-            
+
             drawBib(bib1, gameTime);
             drawBib(bib2, gameTime);
 
