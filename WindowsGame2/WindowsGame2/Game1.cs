@@ -163,31 +163,75 @@ namespace BibbleGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Right) || GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X > 0)
-                bib1.Turn(false);
-            if (Keyboard.GetState().IsKeyDown(Keys.Left) || GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X < 0)
-                bib1.Turn(true);
-            if (Keyboard.GetState().IsKeyDown(Keys.Up) || GamePad.GetState(PlayerIndex.One).Triggers.Right > 0.1)
+            #region controls
+
+            //Keyboard
+
+            //Player 1: Turn right
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                bib1.Turn(1.0f);
+            //Player 1: Turn left
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                bib1.Turn(-1.0f);
+            //Player 1: Accelerate
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
                 bib1.Accelerate();
-            if (Keyboard.GetState().IsKeyDown(Keys.Down) || GamePad.GetState(PlayerIndex.One).Triggers.Left > 0.1)
+            //Player 1: Break
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
                 bib1.Break();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.D) || GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X > 0)
-                bib2.Turn(false);
-            if (Keyboard.GetState().IsKeyDown(Keys.A) || GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X < 0)
-                bib2.Turn(true);
-            if (Keyboard.GetState().IsKeyDown(Keys.W) || GamePad.GetState(PlayerIndex.Two).Triggers.Right > 0.1)
+            //Player 2: Turn right
+            if (Keyboard.GetState().IsKeyDown(Keys.D))
+                bib2.Turn(-1.0f);
+            //Player 2: Turn left
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
+                bib2.Turn(1.0f);
+            //Player 2: Accelerate
+            if (Keyboard.GetState().IsKeyDown(Keys.W))
                 bib2.Accelerate();
-            if (Keyboard.GetState().IsKeyDown(Keys.S) || GamePad.GetState(PlayerIndex.Two).Triggers.Left > 0.1)
+            //Player 2: Break
+            if (Keyboard.GetState().IsKeyDown(Keys.S))
                 bib2.Break();
 
             if (Keyboard.GetState().IsKeyDown(Keys.Z))
                 LaunchItem();
             
+            //GamePad
+
+            //Exit
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                this.Exit();
+
+            //Player 1: Turn right
+            if (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X > 0)
+                bib1.Turn(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X);
+            //Player 1: Turn left
+            if (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X < 0)
+                bib1.Turn(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.X);
+            //Player 1: Accelerate
+            if (GamePad.GetState(PlayerIndex.One).Triggers.Right > 0)
+                bib1.Accelerate(GamePad.GetState(PlayerIndex.One).Triggers.Right);
+            //Player 1: Break
+            if (GamePad.GetState(PlayerIndex.One).Triggers.Left > 0.1)
+                bib1.Break(GamePad.GetState(PlayerIndex.One).Triggers.Left);
+
+            //Player 2: Turn right
+            if (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X > 0)
+                bib2.Turn(GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X);
+            //Player 2: Turn left
+            if (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X < 0)
+                bib2.Turn(GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.X);
+            //Player 2: Accelerate
+            if (GamePad.GetState(PlayerIndex.Two).Triggers.Right > 0.1)
+                bib2.Accelerate(GamePad.GetState(PlayerIndex.Two).Triggers.Right);
+            //Player 2: Break
+            if (GamePad.GetState(PlayerIndex.Two).Triggers.Left > 0.1)
+                bib2.Break(GamePad.GetState(PlayerIndex.Two).Triggers.Left);
+
+            #endregion
+
+
             bib1.Update(gameTime);
             bib2.Update(gameTime);
             if (lastKeyboard != null)
