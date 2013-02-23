@@ -41,6 +41,7 @@ namespace BibbleGame
             public SoundEffect laugh;
             public SoundEffect explosion;
             public SoundEffect comic;
+            public SoundEffect quack;
         }
         public static Defaults Statics;
 
@@ -141,7 +142,7 @@ namespace BibbleGame
             Statics.laugh = this.Content.Load<SoundEffect>("laugh1");
             Statics.explosion = this.Content.Load<SoundEffect>("explosionSound");
             Statics.comic = this.Content.Load<SoundEffect>("comic");
-
+            Statics.quack = this.Content.Load<SoundEffect>("duck-quack4");
             font = Content.Load<SpriteFont>("font");
             fontHuge = Content.Load<SpriteFont>("fontHuge");
         }
@@ -219,7 +220,7 @@ namespace BibbleGame
 
         private void LaunchItem()
         {
-            Item i = new Item(new Vector2(-1, -1), this);
+            Item i = new HealthItem(new Vector2(-1, -1), this);
             AddItem(i);
         }
 

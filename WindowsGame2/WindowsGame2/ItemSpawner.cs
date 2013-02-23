@@ -51,7 +51,7 @@ namespace BibbleGame
                 BibbleGame g = Game as BibbleGame;
                 if (g != null)
                 {
-                    g.AddItem(new Item(new Vector2(-1, -1), g));
+                    g.AddItem(new HealthItem(new Vector2(-1, -1), g));
                 }
             }
             else
