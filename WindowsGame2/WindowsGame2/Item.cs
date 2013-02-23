@@ -11,7 +11,7 @@ namespace BibbleGame
     /* Item Type is via enum to have a common constructor for all items */
     public enum ItemType
     {
-        Dummy, Health, Speed, Acceleration, BulletSpeed, BulletDamage, BulletSplit, MineDamage, MineOuterRadius
+        Dummy, Health, Speed, Acceleration, BulletSpeed, BulletDamage, BulletSplit, MineDamage, MineOuterRadius, Killer
     }
     public class Item : DrawableObject, Collidable
     {
@@ -28,25 +28,35 @@ namespace BibbleGame
 
         public Item(Game g, Vector2 pos, ItemType t, int value) : base(BibbleGame.Statics.BoxTex, pos, g, 1/8.0f) 
         {
-            mType = t;
-            mValue = value;
+            Init(t, value);
         }
 
         public Item(Game g, Vector2 pos, ItemType t)
             : base(BibbleGame.Statics.BoxTex, pos, g, 1 / 8.0f)
         {
-            mType = t;
+            int value = 0;
             switch (t)
             {
-                case ItemType.Acceleration: mValue = 3; break;
-                case ItemType.BulletDamage: mValue = 1; break;
-                case ItemType.BulletSpeed: mValue = 10; break;
-                case ItemType.BulletSplit: mValue = 1; break;
-                case ItemType.Health: mValue = 25; break;
-                case ItemType.MineDamage: mValue = 15; break;
-                case ItemType.MineOuterRadius: mValue = 10; break;
-                case ItemType.Speed: mValue = 2; break;
+                case ItemType.Acceleration: value = 3; break;
+                case ItemType.BulletDamage: value = 1; break;
+                case ItemType.BulletSpeed: value = 10; break;
+                case ItemType.BulletSplit: value = 1; break;
+                case ItemType.Health: value = 25; break;
+                case ItemType.MineDamage: value = 15; break;
+                case ItemType.MineOuterRadius: value = 10; break;
+                case ItemType.Speed: value = 2; break;
+                case ItemType.Killer: value = 30; break;
             }
+            Init(t, value);
+        }
+
+        private void Init(ItemType t, int val)
+        {
+            mType = t;
+            mValue = val;
+
+            if (t == ItemType.Killer)
+                Color = Color.Black;
         }
 
 
@@ -62,6 +72,11 @@ namespace BibbleGame
                 case ItemType.MineDamage: b.MineDamage += Value; break;
                 case ItemType.MineOuterRadius: b.MineOuterRadius += Value; break;
                 case ItemType.Speed: b.MaxSpeed += Value; break;
+                case ItemType.Killer:
+                    BibbleGame bg = Game as BibbleGame;
+                    if (bg == null) break;
+                    bg.Detonate(new Mine(Position, null, BibbleGame.Statics.MineTex, bg));
+                    break;
             }
             BibbleGame.Statics.quack.Play(.1f, 0, 0);
             return true;
@@ -76,6 +91,7 @@ namespace BibbleGame
             switch (t)
             {
                 case ItemType.Health: return 5f;
+                case ItemType.Killer: return 2f;
                 default: return 1f;
             }
         }
