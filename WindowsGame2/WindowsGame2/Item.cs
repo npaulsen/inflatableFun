@@ -60,26 +60,31 @@ namespace BibbleGame
         }
 
 
-        public virtual bool Collide(Bibble b)
+        public virtual bool Collide(Collidable c)
         {
-            switch (Type)
+            if (c is Bibble)
             {
-                case ItemType.Acceleration: b.MaxAcceleration += Value; break;
-                case ItemType.BulletDamage: b.BulletDamage += Value; break;
-                case ItemType.BulletSpeed: b.BulletSpeed += Value; break;
-                case ItemType.BulletSplit: b.SplitBulletMode += Value; break;
-                case ItemType.Health: b.Health += Value; break;
-                case ItemType.MineDamage: b.MineDamage += Value; break;
-                case ItemType.MineOuterRadius: b.MineOuterRadius += Value; break;
-                case ItemType.Speed: b.MaxSpeed += Value; break;
-                case ItemType.Killer:
-                    BibbleGame bg = Game as BibbleGame;
-                    if (bg == null) break;
-                    bg.Detonate(new Mine(Position, null, BibbleGame.Statics.MineTex, bg));
-                    break;
+                Bibble b = (Bibble)c;
+                switch (Type)
+                {
+                    case ItemType.Acceleration: b.MaxAcceleration += Value; break;
+                    case ItemType.BulletDamage: b.BulletDamage += Value; break;
+                    case ItemType.BulletSpeed: b.BulletSpeed += Value; break;
+                    case ItemType.BulletSplit: b.SplitBulletMode += Value; break;
+                    case ItemType.Health: b.Health += Value; break;
+                    case ItemType.MineDamage: b.MineDamage += Value; break;
+                    case ItemType.MineOuterRadius: b.MineOuterRadius += Value; break;
+                    case ItemType.Speed: b.MaxSpeed += Value; break;
+                    case ItemType.Killer:
+                        BibbleGame bg = Game as BibbleGame;
+                        if (bg == null) break;
+                        bg.Detonate(new Mine(Position, null, BibbleGame.Statics.MineTex, bg));
+                        break;
+                }
+                BibbleGame.Statics.quack.Play(.1f, 0, 0);
+                return true;
             }
-            BibbleGame.Statics.quack.Play(.1f, 0, 0);
-            return true;
+            return false;
         }
         /// <summary>
         /// Get a probability coefficient for the Item type. 1.0f is normal, .5f half, 2f double probability

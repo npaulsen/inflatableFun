@@ -51,6 +51,7 @@ namespace BibbleGame
 
         List<Bullet> bullets;
         List<Item> items;
+        List<SimpleCollidableLine> lines;
 
         KeyboardState lastKeyboard;
 
@@ -58,6 +59,8 @@ namespace BibbleGame
         GamePadState lastGamePadTwo;
 
         SpriteFont font, fontHuge;
+
+        public Texture2D LinePixel;
 
         // a random number generator that the whole sample can share.
         private static Random random = new Random();
@@ -94,7 +97,8 @@ namespace BibbleGame
 
             bullets = new List<Bullet>(); // TODO collidable class for trash or explosives
             items = new List<Item>();
-        }
+            lines = new List<SimpleCollidableLine>();
+           }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -106,17 +110,17 @@ namespace BibbleGame
         {
             base.Initialize();
             bib1 = new Bibble(this, Statics.BibbleTex);
-            bib1.Zoom = 100f / Statics.BibbleTex.Width;
+            bib1.Zoom = 60f / Statics.BibbleTex.Width;
             Color c = Color.Purple;
-            c.A = 0x8F;
-            bib2 = new Bibble(this, Statics.BibbleTex, Color.Purple);
-            bib2.Zoom = 100f / Statics.BibbleTex.Width;
+            c.A = 0x6F;
+            bib2 = new Bibble(this, Statics.BibbleTex, c);
+            bib2.Zoom = 60f / Statics.BibbleTex.Width;
             //TODO: list of all damageable objects
             bibbles = new List<Bibble>();
             bibbles.Add(bib1);
             bibbles.Add(bib2);
-            this.Components.Add(new ItemSpawner(this, 10000));
-           
+            this.Components.Add(new ItemSpawner(this, 30000));
+
         }
 
         /// <summary>
@@ -131,7 +135,7 @@ namespace BibbleGame
             spriteBatchEffects = new SpriteBatch(GraphicsDevice);
 
             Statics.BibbleTex = this.Content.Load<Texture2D>("chick");
-            Statics.BulletTex = this.Content.Load<Texture2D>("bullet");
+            Statics.BulletTex = this.Content.Load<Texture2D>("200px-Soccer_ball");
             Statics.MineTex = this.Content.Load<Texture2D>("mine");
             Statics.Circle50 = CreateCircle(50);
             Statics.Circle100 = CreateCircle(100);
@@ -146,6 +150,10 @@ namespace BibbleGame
             Statics.quack = this.Content.Load<SoundEffect>("duck-quack4");
             font = Content.Load<SpriteFont>("font");
             fontHuge = Content.Load<SpriteFont>("fontHuge");
+
+            LinePixel = new Texture2D(GraphicsDevice, 1, 1);
+            LinePixel.SetData<Color>(
+                new Color[] { Color.White });// fill the texture with white
         }
 
         /// <summary>
@@ -184,10 +192,10 @@ namespace BibbleGame
 
             //Player 2: Turn right
             if (Keyboard.GetState().IsKeyDown(Keys.D))
-                bib2.Turn(-1.0f);
+                bib2.Turn(1.0f);
             //Player 2: Turn left
             if (Keyboard.GetState().IsKeyDown(Keys.A))
-                bib2.Turn(1.0f);
+                bib2.Turn(-1.0f);
             //Player 2: Accelerate
             if (Keyboard.GetState().IsKeyDown(Keys.W))
                 bib2.Accelerate();
@@ -197,7 +205,7 @@ namespace BibbleGame
 
             if (Keyboard.GetState().IsKeyDown(Keys.Z))
                 LaunchItem();
-            
+
             //GamePad
 
             //Exit
@@ -253,6 +261,15 @@ namespace BibbleGame
                 {
                     bib2.ShootAction();
                 }
+                if ((lastKeyboard.IsKeyDown(Keys.U) && Keyboard.GetState().IsKeyUp(Keys.U)))
+                {
+                    List<SimpleCollidableLine> l = EdgeScene.getEdgeData(this);
+                    if (l.Count > 0)
+                    {
+                        resetLines();
+                        addLines(l);
+                    }
+                }
             }
             CheckCollisions();
 
@@ -260,7 +277,7 @@ namespace BibbleGame
             lastKeyboard = Keyboard.GetState();
             lastGamePadOne = GamePad.GetState(PlayerIndex.One);
             lastGamePadTwo = GamePad.GetState(PlayerIndex.Two);
-            
+
         }
 
         private void LaunchItem()
@@ -287,14 +304,14 @@ namespace BibbleGame
                         }
                     // TODO: other
                     if (!collides) break; // tries >= 1
-                   
+
                 }
                 if (tries <= 0)
                     return; // failed to find a valid spawn position
             }
             Components.Add(i);
             items.Add(i);
-            
+
         }
 
         private void CheckCollisions()
@@ -307,7 +324,7 @@ namespace BibbleGame
                   angle = (float)(bib1.Width / 2.0 / Math.Sin(angle)); 
               */
 
-            List<DrawableObject> list = new List<DrawableObject>(bullets);
+            List<DrawableObject> list = new List<DrawableObject>(bullets); // allocation every call...
             list.AddRange(items);
             List<Collidable> delete = new List<Collidable>();
 
@@ -324,23 +341,163 @@ namespace BibbleGame
                 {
                     if (bib.IsDead) continue;
                     Vector2 mdis = bib.Position - b.Position;
-                    if (mdis.Length()*2 < bib.Width + b.Width)
+                    if (mdis.Length() * 2 < bib.Width + b.Width)
                     {
                         if (b.Collide(bib))
                         {
-                            Components.Remove(b);
                             delete.Add(b);
                         }
 
                     }
                 }
             }
+
+            foreach (SimpleCollidableLine l in lines)
+            {
+                foreach (Bibble b in bibbles)
+                {
+                    CircleLineIntersect(b, l);
+                }
+                if (l.Closed)
+                {
+                    foreach (Bullet b in bullets)
+                    {
+                        if (CircleLineIntersect(b, l))
+                        {
+                            delete.Add(b);
+                            Explosion(b.Position, 0.05f, false);
+                        }
+                    }
+                }
+            }
             foreach (Collidable c in delete)
             { // bad design: need to know all kinds
+                Components.Remove(c);
                 if (c is Bullet)
                     bullets.Remove((Bullet)c);
                 else if (c is Item)
                     items.Remove((Item)c);
+            }
+        }
+
+        private bool CircleLineIntersect(MovingObject o, SimpleCollidableLine boundry)
+        {
+            Vector2 A = boundry.From;
+            Vector2 B = boundry.To;
+            Vector2 C = o.Position;
+            float r = (o.Width - 5) / 2; // approx. radius of bibble
+            // compute the euclidean distance between A and B
+            float lab = Vector2.Distance(A, B);
+            // compute the direction vector D from A to B
+            Vector2 D = new Vector2((B.X - A.X) / lab, (B.Y - A.Y) / lab);
+            // check, whether the centre of o has passed the line within one update cycle
+            // the object must be fast, else, in the last collision check(s) it would have
+            // touched the line!
+            if (Vector2.Distance(o.LastPos, o.Position) > r) // this object is fast!
+            {
+                Vector2 C2 = o.LastPos;
+                float ua = (C.X - C2.X) * (A.Y - C2.Y) - (C.Y - C2.Y) * (A.X - C2.X);
+                float ub = (B.X - A.X) * (A.Y - C2.Y) - (B.Y - A.Y) * (A.X - C2.X);
+                float denominator = (C.Y - C2.Y) * (B.X - A.X) - (C.X - C2.X) * (B.Y - A.Y);
+
+                if (Math.Abs(denominator) <= 0.00001f)
+                {
+                    if (Math.Abs(ua) <= 0.00001f && Math.Abs(ub) <= 0.00001f && o.Collide(boundry))
+                    {
+                        //arbitrary intersectionpoint
+                        // (A + B) / 2;
+                        return true;
+                    }
+                }
+                else
+                {
+                    ua /= denominator;
+                    ub /= denominator;
+
+                    if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1)
+                    {
+                        // crossing point E
+                        Vector2 Es = new Vector2(A.X + ua * (B.X - A.X), A.Y + ua * (B.Y - A.Y));
+                        // compute the euclidean distance from E to C
+                        float lecs = (float)Math.Sqrt((Es.X - C.X) * (Es.X - C.X) + (Es.Y - C.Y) * (Es.Y - C.Y));
+                        //intersectionPoint.X = A.X + ua * (B.X - A.X);
+                        //intersectionPoint.Y = A.Y + ua * (B.Y - A.Y);
+                        if (o.Collide(boundry))
+                        {
+                            o.Position = Es;
+                            return true;
+                        }
+                        else
+                        {
+                            //position and orientation correction
+                            Vector2 resulting;
+                            Vector2 oldDirection = new Vector2((float)Math.Cos(o.MovementDirection), (float)Math.Sin(o.MovementDirection));
+                            Vector2 normal = new Vector2(-D.Y, D.X);
+                            Vector2.Reflect(ref oldDirection, ref normal, out resulting);
+                            if (resulting.Length() != 1f)
+                            {
+                                resulting.Normalize();
+                            }
+                            o.MovementDirection = (float)Math.Atan2(resulting.Y, resulting.X);
+                            // move it back distance r-lec and furth r-lec again (in the new direction) 
+                            o.Position = Es + resulting * lecs;
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            if (Vector2.Distance(A, C) + Vector2.Distance(B, C) - 2 * r > lab)
+            {
+                return false;
+            }
+
+            
+            // Now the line equation is x = Dx*t + Ax, y = Dy*t + Ay with 0 <= t <= 1.
+            // compute the value t of the closest point to the circle center (Cx, Cy)
+            float t = D.X * (C.X - A.X) + D.Y * (C.Y - A.Y);
+            // This is the projection of C on the line from A to B.
+            // compute the coordinates of the point E on line and closest to C
+            Vector2 E = new Vector2(t * D.X + A.X, t * D.Y + A.Y);
+            // compute the euclidean distance from E to C
+            float lec = (float)Math.Sqrt((E.X - C.X) * (E.X - C.X) + (E.Y - C.Y) * (E.Y - C.Y));
+            // test if the line intersects or tangents the circle
+            if (lec < r) // TODO lec = r
+            {
+                /*    // compute distance from t to circle intersection point
+                    float dt = (float)Math.Sqrt(r * r - lec * lec);
+                    // compute first intersection point
+                    Vector2 F = new Vector2((t - dt) * D.X + A.X, (t - dt) * D.Y + A.Y);
+                    // compute second intersection point
+                    Vector2 G = new Vector2((t + dt) * D.X + A.X, (t + dt) * D.Y + A.Y);*/
+                if (o.Collide(boundry))
+                {
+                    Explosion(E, 0.05f, false); // ugly style
+                    return true;
+                }
+                else
+                {
+                    Vector2 resulting;
+                    Vector2 oldDirection = new Vector2((float)Math.Cos(o.MovementDirection), (float)Math.Sin(o.MovementDirection));
+                    if (Vector2.Distance(C - oldDirection, E) < Vector2.Distance(C + oldDirection, E)) return false;
+                    Vector2 normal = new Vector2(-D.Y, D.X);
+                    Vector2.Reflect(ref oldDirection, ref normal, out resulting);
+                    if (resulting.Length() != 1f)
+                    {
+                        resulting.Normalize();
+                    }
+                    o.MovementDirection = (float)Math.Atan2(resulting.Y, resulting.X);
+                    // move it back distance r-lec and furth r-lec again (in the new direction) 
+                    o.Position -= oldDirection * (r - lec);
+                    o.Position += resulting * (r - lec);
+                    return false;
+                }
+            }
+
+            else
+            {
+                // line doesn't touch circle
+                return false;
             }
         }
 
@@ -355,34 +512,35 @@ namespace BibbleGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         { // http://gamedev.stackexchange.com/questions/24298/performance-architectural-implications-of-calling-spritebatch-begin-end-in-many
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-           // int screenWidth = Window.ClientBounds.Width, screenHeight = Window.ClientBounds.Height;
+            //GraphicsDevice.Clear(Color.CornflowerBlue);
+            // int screenWidth = Window.ClientBounds.Width, screenHeight = Window.ClientBounds.Height;
 
             SpriteBatch sbg = new Microsoft.Xna.Framework.Graphics.SpriteBatch(this.GraphicsDevice);
-            sbg.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            sbg.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
             sbg.Draw(Statics.BackgroundTex, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, .9f);
             sbg.End();
             spriteBatch.Begin();
+
+            base.Draw(gameTime); // calls components, they can use open SpriteBatch
 
             drawBib(bib1, gameTime);
             drawBib(bib2, gameTime);
 
             String s = String.Format("Bibble 1: {0}% {1}", bib1.Health, bib1.Deaths);
-            spriteBatch.DrawString(font, s, new Vector2(51, 51), Color.FromNonPremultiplied(0,0,0,0x8F));
+            spriteBatch.DrawString(font, s, new Vector2(51, 51), Color.FromNonPremultiplied(0, 0, 0, 0x8F));
             spriteBatch.DrawString(font, s, new Vector2(50, 50), bib1.Color);
 
             s = String.Format("Bibble 2: {0}% {1}", bib2.Health, bib2.Deaths);
 
             spriteBatch.DrawString(font, s, new Vector2(Window.ClientBounds.Width - 249, 51), Color.FromNonPremultiplied(0, 0, 0, 0x8F));
             spriteBatch.DrawString(font, s, new Vector2(Window.ClientBounds.Width - 250, 50), bib2.Color);
-                     
-            base.Draw(gameTime); // calls components, they can use open SpriteBatch
+
 
             spriteBatch.End();
 
         }
 
-     
+
         private void drawBib(Bibble bib, GameTime gt)
         {
             if (bib.IsDead)
@@ -405,12 +563,12 @@ namespace BibbleGame
             }
             else
             {
-                float thumbFactor = 0.3f;
                 Vector2 position = bib.Position;
                 if (position.X < 0) position.X = 25;
                 if (position.X > screenWidth) position.X = screenWidth - 25;
                 if (position.Y < 0) position.Y = 25;
                 if (position.Y > screenHeight) position.Y = screenHeight - 25;
+                float thumbFactor = (float) (3 / Math.Log(Vector2.Distance(position, bib.Position)));
                 position = PaintCorner((int)(bib.Width * thumbFactor), (int)(bib.Height * thumbFactor), bib.Orientation + (float)Math.PI/2f, position);
                 spriteBatch.Draw(Statics.BibbleTex, position, Statics.BibbleTex.Bounds, bib.Color, bib.Orientation + (float)Math.PI / 2f, new Vector2(0, 0), bib.Zoom * thumbFactor, SpriteEffects.None, 0);
             }
@@ -418,7 +576,8 @@ namespace BibbleGame
 
         }
 
-        private Vector2 PaintCorner(int width, int height, float orientation, Vector2 center) {
+        private Vector2 PaintCorner(int width, int height, float orientation, Vector2 center)
+        {
             Vector2 offset = new Vector2(width * .5f, height * 0.5f);
             offset = Vector2.Transform(offset, Matrix.CreateRotationZ(orientation));
             return center - offset;
@@ -433,7 +592,7 @@ namespace BibbleGame
                 if (dist < mMine.Radius)
                     b.Damage(mMine.InnerDamage);
                 else if (dist < mMine.OuterRadius)
-                    b.Damage(mMine.InnerDamage * (mMine.OuterRadius-dist) / (mMine.OuterRadius - mMine.Radius));
+                    b.Damage(mMine.InnerDamage * (mMine.OuterRadius - dist) / (mMine.OuterRadius - mMine.Radius));
             }
             Explosion(mMine.Position, .7f, false);
 
@@ -462,7 +621,7 @@ namespace BibbleGame
                     int x = (int)Math.Round((radius - i) + (radius - i) * Math.Cos(angle)) + i;
                     int y = (int)Math.Round((radius - i) + (radius - i) * Math.Sin(angle)) + i;
 
-                    data[y * outerRadius + x + 1] = Color.FromNonPremultiplied(0xFF, 0xFF, 0xFF, 0xA0/(i+1));
+                    data[y * outerRadius + x + 1] = Color.FromNonPremultiplied(0xFF, 0xFF, 0xFF, 0xA0 / (i + 1));
                 }
             }
 
@@ -488,6 +647,31 @@ namespace BibbleGame
         {
             bullets.Add(b);
             Components.Add(b);
+        }
+
+        internal void resetLines()
+        {
+            foreach (SimpleCollidableLine l in lines)
+            Components.Remove(l);
+            lines.Clear();
+            int yMax = Window.ClientBounds.Height;
+            addLine(new SimpleCollidableLine(this, new Vector2(0, 0), new Vector2(Window.ClientBounds.Width, 0)));
+            addLine(new SimpleCollidableLine(this, new Vector2(Window.ClientBounds.Width, 0), new Vector2(Window.ClientBounds.Width, yMax)));
+            addLine(new SimpleCollidableLine(this, new Vector2(Window.ClientBounds.Width, yMax), new Vector2(0, yMax)));
+            addLine(new SimpleCollidableLine(this, new Vector2(0, yMax), new Vector2(0, 0)));
+            addLine(new SimpleCollidableLine(this, new Vector2(150,150), new Vector2(Window.ClientBounds.Width - 150, 150)));
+        }
+
+        internal void addLine(SimpleCollidableLine l)
+        {
+            lines.Add(l);
+            Components.Add(l);
+        }
+        internal void addLines(List<SimpleCollidableLine> l)
+        {
+            foreach (SimpleCollidableLine s in l) {
+                addLine(s);
+            }
         }
     }
 }

@@ -90,6 +90,9 @@
     <Reference Include="mscorlib">
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\..\Downloads\Json60r3\Bin\Net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -109,6 +112,8 @@
   <ItemGroup>
     <Compile Include="Bibble.cs" />
     <Compile Include="Bullet.cs" />
+    <Compile Include="EdgeInterface.cs" />
+    <Compile Include="SimpleCollidable.cs" />
     <Compile Include="Collidable.cs" />
     <Compile Include="DrawableObject.cs" />
     <Compile Include="Item.cs" />

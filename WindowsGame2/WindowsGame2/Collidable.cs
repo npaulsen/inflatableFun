@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace BibbleGame
 {
-    interface Collidable : IGameComponent
+    public interface Collidable : IGameComponent
     {
         Vector2 Position { get; }
 
@@ -19,6 +19,6 @@ namespace BibbleGame
         /// </summary>
         /// <param name="b"></param>
         /// <returns> True, if <this>Component</this> was destroyed</returns>
-        bool Collide(Bibble b);
+        bool Collide(Collidable b);
     }
 }

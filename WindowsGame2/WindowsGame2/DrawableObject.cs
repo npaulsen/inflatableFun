@@ -79,7 +79,12 @@ namespace BibbleGame
             {
                 BibbleGame game = Game as BibbleGame;
                 game.SpriteBatch.Draw(mSpriteTexture, PaintCorner, null /* entire texture */
-                    , this.Color, mDirection, new Vector2(0, 0), mZoom, SpriteEffects.None, 0);
+                    , Color.White, mDirection, new Vector2(0, 0), mZoom, SpriteEffects.None, 0);
+                if (this.Color != Color.White)
+                {
+                    game.SpriteBatch.Draw(mSpriteTexture, PaintCorner, null /* entire texture */
+                        , this.Color, mDirection, new Vector2(0, 0), mZoom, SpriteEffects.None, 0);
+                }
             }
         }
 

@@ -10,9 +10,9 @@ namespace BibbleGame
     public class Bibble : MovingObject
     {
         const int SPAWN_TIME = 5000;
-        const int BLINK_TIME = 250;
+        const int BLINK_TIME = 200;
         static Color BLINK_COLOR = Color.Red;
-        const float DEFAULT_BULLET_SPEED = 20;
+        const float DEFAULT_BULLET_SPEED = 15;
         const int DEFAULT_BULLET_DAMAGE = 5;
         const float DEFAULT_MINE_DAMAGE = 50;
         const float MAX_MINE_DAMAGE = 80;
@@ -37,7 +37,7 @@ namespace BibbleGame
 
         private float mBulletSpeed = DEFAULT_BULLET_SPEED;
         private int mBulletDamage = DEFAULT_BULLET_DAMAGE;
-        private int mSplitBulletMode = 1;
+        private int mSplitBulletMode = 0;
         private float mSplitBulletAngle = .25f;
         private float mMineDamage = DEFAULT_MINE_DAMAGE;
         private float mMineOuterRadius = DEFAULT_MINE_OUTER_RADIUS;
@@ -208,6 +208,12 @@ namespace BibbleGame
             base.Draw(gt);
             if (Health < 30)
                 game.Smoke(Position);
+        }
+
+        public override bool Collide(Collidable c)
+        {
+            //do nothing here
+            return false;
         }
     }
 }

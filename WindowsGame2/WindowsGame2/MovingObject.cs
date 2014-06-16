@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BibbleGame
 {
-    public class MovingObject : DrawableObject
+    public abstract class MovingObject : DrawableObject, Collidable
     {
         private const float VEL_LOSS = 15f;
         private const float TURN_VEL_LOSS = 15f;
@@ -30,6 +30,8 @@ namespace BibbleGame
         float mTurnIntensity = 0;
         float mTurnAccVal = 30f;
         float mMovementDirection = 0f;
+
+        Vector2 lastPos;
 
         #region Properties 
         public virtual float Speed
@@ -79,6 +81,10 @@ namespace BibbleGame
                 //RecalculatePaintCornerOffset();
             } // copypaste from DrawableObject.Orientation
         }
+        public virtual Vector2 LastPos
+        {
+            get { return lastPos; }
+        }
 
         #endregion
 
@@ -91,9 +97,12 @@ namespace BibbleGame
             this.Orientation = orient;
             this.MovementDirection = orient;
             this.Speed = speed;
+            this.lastPos = pos;
         }
 
-        public MovingObject(Game g, Texture2D tex, Vector2 pos) : base(tex,pos,g) {}
+        public MovingObject(Game g, Texture2D tex, Vector2 pos) : base(tex,pos,g) {
+            this.lastPos = pos;
+        }
  
   
         public void Accelerate()
@@ -159,8 +168,11 @@ namespace BibbleGame
             Vector2 resulting = oldMvmt + newMvmt;
             this.Speed = resulting.Length();
             this.MovementDirection = (float)Math.Atan2(resulting.Y, resulting.X);
+            lastPos = Position;
             Position += oldMvmt + newMvmt;
-
         }
+
+
+        public abstract bool Collide(Collidable b);
     }
 }

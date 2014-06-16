@@ -12,6 +12,7 @@ namespace BibbleGame
         {
             using (BibbleGame game = new BibbleGame())
             {
+                EdgeScene.test();
                 game.Run();
             }
         }
